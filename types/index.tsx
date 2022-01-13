@@ -23,8 +23,9 @@ export interface Photo {
 }
 
 export interface Filter {
-  rover: "curiosity" | "spirit" | "opportunity";
-  camera:
+  [key: string]: string | number | undefined | null;
+  rover?: "curiosity" | "spirit" | "opportunity" | "";
+  camera?:
     | "fhaz"
     | "rhaz"
     | "mast"
@@ -35,6 +36,18 @@ export interface Filter {
     | "pancam"
     | "minites"
     | "";
-  earth_date: string;
+  earth_date: any;
   sol: number;
 }
+
+export interface SearchState {
+  filter: Filter;
+  results: Photo[];
+  loading: boolean;
+  page: number;
+}
+
+export type SearchAction =
+  | { type: "FILTER_UPDATE"; payload: any }
+  | { type: "NEXT_PAGE"; payload: any }
+  | { type: "TOGGLE_LOADING" };

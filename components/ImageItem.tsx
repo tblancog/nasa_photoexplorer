@@ -1,5 +1,4 @@
-import { Flex, Box, Text } from "@chakra-ui/layout";
-import { NextComponentType } from "next";
+import { Box, Text, Stack } from "@chakra-ui/layout";
 import Image from "next/image";
 import React from "react";
 import { Photo } from "../types";
@@ -11,8 +10,8 @@ interface PhotoProps {
 
 const ImageItem = ({ image }: PhotoProps) => {
   return (
-    <Flex flexWrap="wrap" w="240px" pt="5" justifyContent="flex-start">
-      <Box w="full">
+    <Stack p={"4"}>
+      <Box maxW={"250px"}>
         <Image
           src={image.img_src}
           width={400}
@@ -26,7 +25,7 @@ const ImageItem = ({ image }: PhotoProps) => {
         />
       </Box>
       <Text>{image.id}</Text>
-    </Flex>
+    </Stack>
   );
 };
 

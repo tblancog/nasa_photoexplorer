@@ -1,10 +1,8 @@
 import {
   Flex,
-  Box,
   Select,
   FormControl,
   FormLabel,
-  Text,
   Input,
   NumberInput,
   NumberInputField,
@@ -21,25 +19,15 @@ import "react-datepicker/dist/react-datepicker.css";
 import { toUnixDate } from "../utils";
 
 interface SearchProps {
+  filter: Filter;
   handle: Function;
 }
 
-const SearchFilters = ({ handle }: SearchProps) => {
-  const [filters, setFilters] = useState<Filter>({
-    rover: "curiosity",
-    camera: "",
-    earth_date: toUnixDate(new Date()),
-    sol: 0,
-  });
-  const [date, setDate] = useState<any>(new Date());
-  const onSelectedFilter = (filterSelected: any) => {
-    const newFilters = { ...filters, ...filterSelected };
-    setFilters(newFilters);
-    handle(newFilters);
-  };
+const SearchFilters = ({ filter, handle }: SearchProps) => {
+  const [date, setDate] = useState<Date | null>(new Date());
 
   useEffect(() => {
-    onSelectedFilter({ earth_date: toUnixDate(date) });
+    handle({ earth_date: toUnixDate(date) });
     // eslint-disable-next-line
   }, [date]);
 
@@ -52,10 +40,9 @@ const SearchFilters = ({ handle }: SearchProps) => {
         <Select
           id="rover"
           w="100%"
+          value={filter.rover}
           onChange={(e) =>
-            onSelectedFilter({
-              [rovers.name]: e.target.value,
-            })
+            handle({ [rovers.name]: e.target.value, camera: "" })
           }
         >
           {rovers.items.map((item) => (
@@ -73,17 +60,19 @@ const SearchFilters = ({ handle }: SearchProps) => {
         <Select
           id="camera"
           placeholder={"All"}
-          onChange={(e) =>
-            onSelectedFilter({
-              [cameras.name]: e.target.value,
-            })
-          }
+          value={filter.camera}
+          onChange={(e) => handle({ [cameras.name]: e.target.value })}
         >
           {cameras.items
-            .filter((item) => item.rovers.includes(filters.rover))
+            .filter((item) => {
+              if (item.rovers.includes(filter.rover ?? "curiosity")) {
+                return true;
+              }
+              return false;
+            })
             .map((item) => (
               <option key={item.value} value={item.value}>
-                {item.title}
+                {`(${item.value.toUpperCase()}) ${item.title}`}
               </option>
             ))}
         </Select>
@@ -106,8 +95,8 @@ const SearchFilters = ({ handle }: SearchProps) => {
         </FormLabel>
         <NumberInput
           id="solLabel"
-          value={filters.sol}
-          onChange={(value) => onSelectedFilter({ sol: value })}
+          value={filter.sol}
+          onChange={(value) => handle({ sol: +value })}
           min={0}
           max={1000}
         >
@@ -116,7 +105,7 @@ const SearchFilters = ({ handle }: SearchProps) => {
             <NumberIncrementStepper />
             <NumberDecrementStepper />
           </NumberInputStepper>
-        </NumberInput>{" "}
+        </NumberInput>
       </FormControl>
     </Flex>
   );
