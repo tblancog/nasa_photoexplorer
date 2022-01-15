@@ -26,7 +26,7 @@ When you finish the test, push it as a public repository in github, gitlab, bitb
 
 ## Summary
 
-Nasa Photo Explorer API is a challenge app that searches rover pictures data using the NASA Rover Api, it searches images with these filters:
+Nasa Photo Explorer API is a challenge app that searches rover pictures using the NASA Rover Api, it searches images with these filters:
 
 - Rover name
 - Rover camera
@@ -46,13 +46,13 @@ As for react it has these features:
 ## Challenges faced
 
 - Spent so much time trying to configure a test suite due to the setup I used: Chakra and NextJS. For instance I decided to skip tests because of the random errors I got. For this problem a better approach would be to have used a simple react-create-app setup to make things more easy.
-- The earth day filter didn't work in the Nasa API, no matter the value passed, it always returns the same images, result are affected only by the rest of the filters.
+- The earth day filter didn't work in the Nasa API, no matter the value passed, it always returns the same images, the results are affected only by the rest of the filters.
 
 ## Installation
 
 - Clone repo
 
-- Rename `.env.example` file to `env`.
+- Rename `.env.example` file to `.env`.
 
 - Get an API key from the NASA website and paste it in the contents of the `.env` file for the `NEXT_PUBLIC_API_BASE_API_KEY` variable.
 
