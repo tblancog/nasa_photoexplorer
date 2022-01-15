@@ -1,28 +1,22 @@
 import { Filter, SearchAction, SearchState } from "../types";
 
-export const fetchRoverPhotos = async (filter: Filter, page = 1) => {
-  // Rover path filter
-  let currentRover = filter.rover === "" ? "curiosity" : filter.rover;
-  const { rover, ...rest } = filter;
-
-  // To querystring
-  const qsParams = Object.keys(rest)
-    .filter((f) => rest[f] !== "")
-    .map((f) => `${f}=${rest[f]}`)
-    .join("&");
-
-  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/rovers/${currentRover}/photos?&api_key=${process.env.NEXT_PUBLIC_API_BASE_API_KEY}&${qsParams}&page=${page}`;
-  console.log({ url });
-  const res = await fetch(url);
-  const { photos } = await res.json();
-  return photos;
-};
-
 export const toUnixDate = (date: Date | null): string | null => {
   if (!date) {
     return null;
   }
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date?.getDate()}`;
+};
+
+export const initialState: SearchState = {
+  filter: {
+    rover: "curiosity",
+    camera: "",
+    earth_date: new Date(),
+    sol: 1000,
+  },
+  results: [],
+  loading: false,
+  page: 1,
 };
 
 // search reducer
@@ -58,4 +52,21 @@ export const searchReducer = (
     default:
       return state;
   }
+};
+
+export const fetchRoverPhotos = async (filter: Filter, page = 1) => {
+  // Rover path filter
+  let currentRover = filter.rover === "" ? "curiosity" : filter.rover;
+  const { rover, earth_date, ...rest } = filter;
+
+  // To querystring
+  const qsParams = Object.keys(rest)
+    .filter((f) => rest[f] !== "")
+    .map((f) => `${f}=${rest[f]}`)
+    .join("&");
+
+  const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/rovers/${currentRover}/photos?&api_key=${process.env.NEXT_PUBLIC_API_BASE_API_KEY}&${qsParams}&page=${page}`;
+  const res = await fetch(url);
+  const { photos } = await res.json();
+  return photos;
 };

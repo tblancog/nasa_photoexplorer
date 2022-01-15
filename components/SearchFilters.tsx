@@ -10,13 +10,11 @@ import {
   NumberIncrementStepper,
   NumberDecrementStepper,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import { Filter } from "../types";
 import { rovers, cameras } from "../utils/filterData";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { toUnixDate } from "../utils";
 
 interface SearchProps {
   filter: Filter;
@@ -24,13 +22,6 @@ interface SearchProps {
 }
 
 const SearchFilters = ({ filter, handle }: SearchProps) => {
-  const [date, setDate] = useState<Date | null>(new Date());
-
-  useEffect(() => {
-    handle({ earth_date: toUnixDate(date) });
-    // eslint-disable-next-line
-  }, [date]);
-
   return (
     <Flex p="4">
       <FormControl p={3}>
@@ -83,8 +74,8 @@ const SearchFilters = ({ filter, handle }: SearchProps) => {
         </FormLabel>
 
         <DatePicker
-          selected={date}
-          onChange={(date) => setDate(date)}
+          selected={new Date(filter.earth_date)}
+          onChange={(date) => handle({ earth_date: date })}
           customInput={<Input />}
         />
       </FormControl>

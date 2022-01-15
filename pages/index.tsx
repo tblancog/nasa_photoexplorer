@@ -1,42 +1,35 @@
-import { useReducer } from "react";
-import Icon from "@chakra-ui/icon";
+import { useEffect, useReducer } from "react";
 import { Box, Button, Flex, Text } from "@chakra-ui/react";
-import type { NextPage } from "next";
+import { NextPage } from "next";
 import ImageItem from "../components/ImageItem";
-import { Photo, Filter, SearchState } from "../types";
+import { Photo, Filter } from "../types";
 import SearchFilters from "../components/SearchFilters";
-import { fetchRoverPhotos, searchReducer, toUnixDate } from "../utils";
+import { initialState, fetchRoverPhotos, searchReducer } from "../utils";
 
 interface ImageProps {
   photos: Photo[];
 }
 
-const initialState: SearchState = {
-  filter: {
-    rover: "curiosity",
-    camera: "",
-    earth_date: toUnixDate(new Date()),
-    sol: 1000,
-  },
-  results: [],
-  loading: false,
-  page: 1,
-};
+let currentState = initialState;
+
 const Home: NextPage<ImageProps> = ({ photos }) => {
   initialState.results = photos;
-  const [state, dispatch] = useReducer(searchReducer, initialState);
+
+  const [state, dispatch] = useReducer(searchReducer, currentState);
 
   const onFilterUpate = async (newFilter: Filter) => {
     const temp = { ...state.filter, ...newFilter };
     const results = (await fetchRoverPhotos(temp)) ?? [];
+    const payload = {
+      filter: temp,
+      results,
+      page: initialState.page,
+    };
     dispatch({
       type: "FILTER_UPDATE",
-      payload: {
-        filter: temp,
-        results,
-        page: initialState.page,
-      },
+      payload,
     });
+    localStorage.setItem("localFilter", JSON.stringify(payload));
   };
 
   const getNextPage = async () => {
@@ -46,6 +39,26 @@ const Home: NextPage<ImageProps> = ({ photos }) => {
     dispatch({ type: "NEXT_PAGE", payload: newPageResults });
     dispatch({ type: "TOGGLE_LOADING" });
   };
+
+  useEffect(() => {
+    // Initial state may come locally
+    currentState =
+      (localStorage &&
+        localStorage.getItem("localFilter") &&
+        JSON.parse(localStorage.getItem("localFilter") ?? "")) ??
+      {};
+
+    if (Object.keys(currentState).length > 0) {
+      dispatch({
+        type: "FILTER_UPDATE",
+        payload: currentState,
+      });
+      return;
+    }
+    // Optionally store the state in localstorage
+    localStorage.setItem("localFilter", JSON.stringify(initialState));
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <Box maxWidth="1280px" my={0} mx="auto">
@@ -64,7 +77,7 @@ const Home: NextPage<ImageProps> = ({ photos }) => {
       </Flex>
       <SearchFilters filter={state.filter} handle={onFilterUpate} />
 
-      <Flex flexWrap="wrap" justifyContent={"flex-start"}>
+      <Flex flexWrap="wrap" justifyContent={"space-between"}>
         {state.results && state.results.length === 0 ? (
           <Text my={0} mx="auto">
             No rover images matching the criteria

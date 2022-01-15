@@ -23,7 +23,7 @@ export interface Photo {
 }
 
 export interface Filter {
-  [key: string]: string | number | undefined | null;
+  [key: string]: string | number | Date | undefined | null;
   rover?: "curiosity" | "spirit" | "opportunity" | "";
   camera?:
     | "fhaz"
